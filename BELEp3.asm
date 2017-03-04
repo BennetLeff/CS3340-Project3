@@ -9,12 +9,26 @@ main:
 	syscall
 	move $a1, $v0	
 	
-	jal cfunc
+	add $t0, $a1, $zero	# store k in t0 to check if k is zero
+	beqz $a0, isKZero
+
+kNotZero: 			# only gets here if k != 0 and n != 0
+	jal cfunc		# call function
 	
-	add $a0, $v0, $zero
+	add $a0, $v0, $zero	# add the return value to $a0 and print it
 	li $v0, 1
 	syscall
+
+	li $v0, 11		# print new line char after printing calculation
+	li $a0, 0xa
+	syscall
 	
+	j main			# loop back to main
+
+isKZero:			# if k != 0, go to kNotZero, else exit
+	bnez $t1, kNotZero
+
+exit:		
 	li $v0, 10
 	syscall
 	
@@ -58,6 +72,6 @@ cfuncDone:
 	
 	jr $ra
 	
-ELSE:
+ELSE:				# "return" 1
 	li $v0, 1
 	j cfuncDone
